@@ -10,15 +10,14 @@ with open('LICENSE') as license_file:
     license = license_file.read()
 
 requirements = [
-    'docopt>=0.6',
-    'requests'
+    'Click'
 ]
 
 test_requirements = []
 
 setup(
     name='ioc_fanger',
-    version='2.0.4',
+    version='3.0.3',
     description="Python package to defang and refang indicators of compromise from text.",
     long_description=readme,
     author="Floyd Hightower",
@@ -27,7 +26,8 @@ setup(
     packages=find_packages(exclude=('tests', 'docs')),
     entry_points={
         'console_scripts': [
-            'ioc_fanger=ioc_fanger.cli:main'
+            'fang=ioc_fanger.ioc_fanger:cli_fang',
+            'defang=ioc_fanger.ioc_fanger:cli_defang'
         ]
     },
     include_package_data=True,

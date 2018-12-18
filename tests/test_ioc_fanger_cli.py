@@ -2,37 +2,30 @@
 # -*- coding: utf-8 -*-
 
 """
-test_ioc_fanger_cli
+test_ioc_fanger
 ----------------------------------
 
-Tests for `ioc_fanger` cli.
+Tests for `ioc_fanger` module.
 """
 
-import os
-
-import docopt
 import pytest
+from click.testing import CliRunner
 
-from ioc_fanger import cli
-
-
-@pytest.fixture
-def command_line_args():
-    """Function to simulate command line arguments using docopt."""
-    args = dict()
-
-    # TODO: Add command line arguments here (see: https://github.com/docopt/docopt#api)
-
-    return args
+from ioc_fanger import ioc_fanger
+from .test_ioc_fanger import defanged_text, fanged_text
 
 
-def test_command_line_interface(command_line_args):
-    """Test the command line usage of this project."""
-    # TODO: Add more robust testing here
-    with pytest.raises(docopt.DocoptExit) as exc_info:
-        cli.main()
+def test_fang_cli(defanged_text, fanged_text):
+    runner = CliRunner()
+    result = runner.invoke(ioc_fanger.cli_fang, [defanged_text])
+    assert result.exit_code == 0
+    assert result.output.strip() == fanged_text
 
-    # get the error message
-    error_message = exc_info.value
-    # make sure the error message contains the expected usage output
-    assert "Usage:" in str(error_message)
+
+def test_defang_cli(defanged_text, fanged_text):
+    runner = CliRunner()
+    result = runner.invoke(ioc_fanger.cli_defang, [fanged_text])
+    assert result.exit_code == 0
+    assert "hXXp://example[.]com" in result.output
+    assert "1[.]2.3[.]4" in result.output
+    assert "bob(at)example[.]com" in result.output

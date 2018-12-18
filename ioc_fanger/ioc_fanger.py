@@ -6,6 +6,8 @@ import json
 import os
 import re
 
+import click
+
 FANG_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "./fang.json"))
 DEFANG_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "./defang.json"))
 
@@ -26,12 +28,25 @@ def fang(text):
     fanged_text = text
 
     for mapping in fanging_mappings:
-        if mapping.get('case_sensitive'):
-            fanged_text = re.sub(re.escape(mapping['find']), mapping['replace'], fanged_text)
+        if mapping.get('regex'):
+            find_value = mapping['find']
         else:
-            fanged_text = re.sub(re.escape(mapping['find']), mapping['replace'], fanged_text, flags=re.IGNORECASE)
+            find_value = re.escape(mapping['find'])
+
+        if mapping.get('case_sensitive'):
+            fanged_text = re.sub(find_value, mapping['replace'], fanged_text)
+        else:
+            fanged_text = re.sub(find_value, mapping['replace'], fanged_text, flags=re.IGNORECASE)
 
     return fanged_text
+
+
+@click.command()
+@click.argument('text')
+def cli_fang(text):
+    """CLI interface for fanging indicators."""
+    fanged_text = fang(text)
+    print(fanged_text)
 
 
 def defang(text):
@@ -49,3 +64,11 @@ def defang(text):
         defanged_text = re.sub(mapping['find'], _replace, defanged_text)
 
     return defanged_text
+
+
+@click.command()
+@click.argument('text')
+def cli_defang(text):
+    """CLI interface for defanging indicators."""
+    defanged_text = defang(text)
+    print(defanged_text)
